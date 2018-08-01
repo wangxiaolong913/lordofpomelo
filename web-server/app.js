@@ -5,9 +5,7 @@ var userDao = require('./lib/dao/userDao');
 var app = express();
 var mysql = require('./lib/dao/mysql/mysql');
 var everyauth = require('./lib/oauth');
-
 var publicPath = __dirname + '/public';
-
 var methodOverride = require('method-override')
 var bodyParser = require('body-parser')
 var cookieParser = require('cookie-parser');
@@ -19,7 +17,6 @@ app.use(methodOverride());
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-
 app.use(session({
   secret: "keyboard cat",
   name: 'testapp',
@@ -29,9 +26,11 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }));
-
 app.use(cookieParser());
-// app.use(everyauth.middleware());
+app.use(function (req, res, next) {
+  everyauth.middleware();
+  next();
+});
 app.use(router);
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
@@ -39,9 +38,7 @@ app.set('view options', {
   layout: false
 });
 app.set('basepath', publicPath);
-
 app.use(express.static(publicPath));
-
 app.use(errorhandler());
 
 // app.configure('development', function(){
