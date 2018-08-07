@@ -31,7 +31,7 @@ NND.query = function (sql, args, cb) {
 			});
 		}).catch(function (err) {
 			console.error('[sqlqueryErr] ' + err);
-			console.log('NND终于找到你了');
+			console.error('看到这句话就知道问题在哪了')
 			_pool = require('./dao-pool').createMysqlPool(app);
 			this.query(sql, args, cb);
 			// return;
