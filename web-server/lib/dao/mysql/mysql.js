@@ -32,7 +32,10 @@ NND.query = function (sql, args, callback) {
 			});
 		}).catch(function (err) {
 			console.error('[sqlqueryErr] ' + err);
-			return;
+			console.error('看到这句话就知道问题在哪了')
+			_pool = require('./dao-pool').createMysqlPool(app);
+			this.query(sql, args, cb);
+			// return;
 		});
 };
 
