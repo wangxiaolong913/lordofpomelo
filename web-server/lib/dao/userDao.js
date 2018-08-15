@@ -35,7 +35,7 @@ userDao.createUser = function (username, password, from, cb){
   var sql = 'insert into User (name,password,`from`,loginCount,lastLoginTime) values(?,?,?,?,?)';
   var loginTime = Date.now();
   var args = [username, password, from || '', 1, loginTime];
-  mysql.insert(sql, args, function(err,res){
+  mysql.query(sql, args, function(err,res){
     if(err !== null){
       cb({code: err.number, msg: err.message}, null);
     } else {

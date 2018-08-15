@@ -1,70 +1,28 @@
-// mysql CRUD
-var sqlclient = module.exports;
+var mysql = require('mysql');
+var mysqlConfig = require('../../../../shared/config/mysql');
 
-var _pool = null;
+var env = process.env.NODE_ENV || 'development';
+if (mysqlConfig[env]) {
+    mysqlConfig = mysqlConfig[env];
+}
 
-var NND = {};
+var pools;
 
-/*
- * Innit sql connection pool
- * @param {Object} app The app for the server.
- */
-NND.init = function () {
-	if (!_pool)
-		_pool = require('./dao-pool').createMysqlPool();
-};
+//使用数据库连接池  回调函数
+function mysqlPools(...args) {
+    if (pools == null) {
+        pools = mysql.createPool(mysqlConfig);
+    }
 
-/**
- * Excute sql statement
- * @param {String} sql Statement The sql need to excute.
- * @param {Object} args The args for the sql.
- * @param {fuction} callback Callback function.
- * 
- */
-NND.query = function (sql, args, callback) {
+    var data = args[1] || [];
+    console.log('Print SQL:' + args[0] + JSON.stringify(data));
 
-	const resourcePromise = _pool.acquire();
-	resourcePromise
-		.then(function (client) {
-			client.query(sql, args, function (err, res) {
-				_pool.release(client);
-				callback.apply(null, [err, res]);
-			});
-		}).catch(function (err) {
-			console.error('[sqlqueryErr] ' + err);
-			console.error('看到这句话就知道问题在哪了')
-			_pool = require('./dao-pool').createMysqlPool(app);
-			this.query(sql, args, cb);
-			// return;
-		});
-};
+    pools.query(args[0], data, function (error, results, fields) {
+        console.log('The solution is: ' + JSON.stringify(results));
+        args[args.length-1](error, results)
+    });
+}
 
-/**
- * Close connection pool.
- */
-NND.shutdown = function () {
-	_pool.destroyAllNow();
-};
 
-/**
- * init database
- */
-sqlclient.init = function () {
-	if (!!_pool) {
-		return sqlclient;
-	} else {
-		NND.init();
-		sqlclient.insert = NND.query;
-		sqlclient.update = NND.query;
-		//sqlclient.delete = NND.query;
-		sqlclient.query = NND.query;
-		return sqlclient;
-	}
-};
 
-/**
- * shutdown database
- */
-sqlclient.shutdown = function () {
-	NND.shutdown();
-};
+exports.query = mysqlPools;
