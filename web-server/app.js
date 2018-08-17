@@ -3,7 +3,8 @@ var Token = require('../shared/token');
 var secret = require('../shared/config/session').secret;
 var userDao = require('./lib/dao/userDao');
 var app = express();
-// var mysql = require('./lib/dao/mysql/mysql');
+//wxl hahaah
+// var mysql = require('./lib/dao/mysql/mysql'); 
 var everyauth = require('./lib/oauth');
 var publicPath = __dirname + '/public';
 var methodOverride = require('method-override')
